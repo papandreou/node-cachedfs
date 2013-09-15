@@ -69,27 +69,27 @@ describe('CachedFs', function () {
 
         it('should be able to readFile foo.txt', function (done) {
             memoizedFs.readFile(pathToFooTxt, passError(done, function (contents) {
-                expect(contents, 'to equal', new Buffer([0x62, 0x6c, 0x61, 0xe2, 0x98, 0xba, 0x62, 0x6c, 0x61, 0x0a]));
+                expect(contents, 'to equal', new Buffer('bla☺bla\n', 'utf-8'));
                 done();
             }));
         });
 
         it('should be able to readFileSync foo.txt', function () {
-            expect(memoizedFs.readFileSync(pathToFooTxt), 'to equal', new Buffer([0x62, 0x6c, 0x61, 0xe2, 0x98, 0xba, 0x62, 0x6c, 0x61, 0x0a]));
+            expect(memoizedFs.readFileSync(pathToFooTxt), 'to equal', new Buffer('bla☺bla\n', 'utf-8'));
         });
 
         it('should be able to readFile foo.txt as utf-8', function (done) {
             memoizedFs.readFile(pathToFooTxt, 'utf-8', passError(done, function (contents) {
-                expect(contents, 'to equal', "bla☺bla\n");
+                expect(contents, 'to equal', 'bla☺bla\n');
                 done();
             }));
         });
 
         it('should be able to readFile foo.txt as utf-8 then as a Buffer', function (done) {
             memoizedFs.readFile(pathToFooTxt, 'utf-8', passError(done, function (contents) {
-                expect(contents, 'to equal', "bla☺bla\n");
+                expect(contents, 'to equal', 'bla☺bla\n');
                 memoizedFs.readFile(pathToFooTxt, passError(done, function (contentsAsBuffer) {
-                    expect(contentsAsBuffer, 'to equal', new Buffer([0x62, 0x6c, 0x61, 0xe2, 0x98, 0xba, 0x62, 0x6c, 0x61, 0x0a]));
+                    expect(contentsAsBuffer, 'to equal', new Buffer('bla☺bla\n', 'utf-8'));
                     done();
                 }));
             }));

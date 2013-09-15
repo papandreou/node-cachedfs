@@ -3,7 +3,9 @@ var expect = require('unexpected-sinon'),
     Path = require('path'),
     passError = require('passerror'),
     CachedFs = require('../lib/CachedFs'),
-    pathToFooTxt = Path.resolve(__dirname, 'root', 'foo.txt');
+    pathToTestFiles = Path.resolve(__dirname, 'root'),
+    pathToFooTxt = Path.resolve(pathToTestFiles, 'foo.txt'),
+    alternativePathToFooTxt = pathToTestFiles + Path.sep + '.' + Path.sep + 'foo.txt';
 
 describe('CachedFs', function () {
     describe('applied to a stubbed out fs module with only a readFile function', function () {
@@ -95,11 +97,31 @@ describe('CachedFs', function () {
             }));
         });
 
+        // This is debatable, maybe they should get different Buffer instances?
         it('should return the same Buffer instance when the readFile function is called repeatedly', function (done) {
             memoizedFs.readFile(pathToFooTxt, passError(done, function (firstContents) {
                 expect(firstContents, 'to be', firstContents);
                 memoizedFs.readFile(pathToFooTxt, passError(done, function (secondContents) {
                     expect(secondContents, 'to be', firstContents);
+                    done();
+                }));
+            }));
+        });
+
+        it('should return the same buffer instance when the readFile function is called more than once with different representations of the path to foo.txt', function (done) {
+            memoizedFs.readFile(pathToFooTxt, passError(done, function (firstContents) {
+                memoizedFs.readFile(alternativePathToFooTxt, passError(done, function (secondContents) {
+                    expect(secondContents, 'to be', firstContents);
+                    done();
+                }));
+            }));
+        });
+
+        // This is debatable, maybe they should get different array instances?
+        it('should return the same array when readdir is called with and without a trailing slash', function (done) {
+            memoizedFs.readdir(pathToTestFiles, passError(done, function (firstEntries) {
+                memoizedFs.readdir(pathToTestFiles + Path.sep, passError(done, function (secondEntries) {
+                    expect(secondEntries, 'to be', firstEntries);
                     done();
                 }));
             }));

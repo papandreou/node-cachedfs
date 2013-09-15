@@ -13,7 +13,7 @@
     "passerror": "=0.0.2"
   },
   "devDependencies": {
-    "mocha": "=1.12.1",
+    "mocha": "=1.13.0",
     "sinon": "=1.7.3",
     "unexpected": "=0.1.1",
     "unexpected-sinon": "=0.1.0"

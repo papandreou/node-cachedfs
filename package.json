@@ -1,6 +1,6 @@
 {
   "name": "cachedfs",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Caching wrapper for node.js' built-in fs module (or compatible)",
   "main": "lib/CachedFs.js",
   "scripts": {

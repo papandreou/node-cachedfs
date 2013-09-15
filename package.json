@@ -1,0 +1,23 @@
+{
+  "name": "cachedfs",
+  "version": "0.0.0",
+  "description": "Caching wrapper for node.js' built-in fs module (or compatible)",
+  "main": "lib/CachedFs.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "dependencies": {
+    "bufferedstream": "~1.6.0",
+    "memoizeasync": "=0.3.1",
+    "memoizesync": "=0.2.1",
+    "passerror": "=0.0.2"
+  },
+  "devDependencies": {
+    "mocha": "=1.12.1",
+    "sinon": "=1.7.3",
+    "unexpected": "=0.1.1",
+    "unexpected-sinon": "=0.1.0"
+  },
+  "author": "Andreas Lind Petersen <andreas@one.com>",
+  "license": "BSD"
+}

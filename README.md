@@ -19,8 +19,7 @@ fs.readFile('foo.txt', function (err, contents) {
 });
 ```
 
-Supported functions:
-
+Supported functions (plus their -`Sync` counterparts):
  * `stat`
  * `lstat`
  * `fstat`

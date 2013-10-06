@@ -23,21 +23,21 @@ describe('CachedFs', function () {
                     });
                 }
             },
-            memoizedFs;
+            cachedFs;
 
         sinon.spy(stubbedFs, 'readFile');
 
         beforeEach(function () {
-            memoizedFs = new CachedFs(stubbedFs);
+            cachedFs = new CachedFs(stubbedFs);
         });
 
         it('should produce an object with a readFile and readFileSync property', function () {
-            expect(memoizedFs, 'to have keys', ['readFile', 'readFileSync']);
+            expect(cachedFs, 'to have keys', ['readFile', 'readFileSync']);
         });
 
         it('should only call the stubbed-out readFile once', function (done) {
-            memoizedFs.readFile(pathToFooTxt, passError(done, function (firstContents) {
-                memoizedFs.readFile(pathToFooTxt, passError(done, function (secondContents) {
+            cachedFs.readFile(pathToFooTxt, passError(done, function (firstContents) {
+                cachedFs.readFile(pathToFooTxt, passError(done, function (secondContents) {
                     expect(stubbedFs.readFile, 'was called once');
                     done();
                 }));
@@ -45,8 +45,8 @@ describe('CachedFs', function () {
         });
 
         it('should make readFileSync work if readFile has previously been called with the same arguments', function (done) {
-            memoizedFs.readFile(pathToFooTxt, passError(done, function (contents) {
-                var syncReadContents = memoizedFs.readFileSync(pathToFooTxt);
+            cachedFs.readFile(pathToFooTxt, passError(done, function (contents) {
+                var syncReadContents = cachedFs.readFileSync(pathToFooTxt);
                 expect(syncReadContents, 'to be', contents);
                 done();
             }));
@@ -54,7 +54,7 @@ describe('CachedFs', function () {
 
         it('should make createReadStream work', function (done) {
             var chunks = [];
-            memoizedFs.createReadStream(pathToFooTxt)
+            cachedFs.createReadStream(pathToFooTxt)
                .on('data', function (chunk) {
                    chunks.push(chunk);
                })
@@ -68,42 +68,42 @@ describe('CachedFs', function () {
 
     describe('applied to the built-in fs module', function () {
         describe('with the default options', function () {
-            var memoizedFs;
+            var cachedFs;
             beforeEach(function () {
-                memoizedFs = new CachedFs(require('fs'));
+                cachedFs = new CachedFs(require('fs'));
             });
 
             it('should be able to readFile foo.txt', function (done) {
-                memoizedFs.readFile(pathToFooTxt, passError(done, function (contents) {
+                cachedFs.readFile(pathToFooTxt, passError(done, function (contents) {
                     expect(contents, 'to equal', new Buffer('bla☺bla\n', 'utf-8'));
                     done();
                 }));
             });
 
             it('should be able to readFileSync foo.txt', function () {
-                expect(memoizedFs.readFileSync(pathToFooTxt), 'to equal', new Buffer('bla☺bla\n', 'utf-8'));
+                expect(cachedFs.readFileSync(pathToFooTxt), 'to equal', new Buffer('bla☺bla\n', 'utf-8'));
             });
 
             it('should use the same cache key for readFile and readFileSync', function (done) {
-                memoizedFs.readFile(pathToFooTxt, passError(done, function (asyncReadContents) {
-                    var syncReadContents = memoizedFs.readFileSync(pathToFooTxt);
+                cachedFs.readFile(pathToFooTxt, passError(done, function (asyncReadContents) {
+                    var syncReadContents = cachedFs.readFileSync(pathToFooTxt);
                     expect(asyncReadContents, 'to be', syncReadContents);
-                    expect(memoizedFs.cache.keys(), 'to have length', 1);
+                    expect(cachedFs.cache.keys(), 'to have length', 1);
                     done();
                 }));
             });
 
             it('should be able to readFile foo.txt as utf-8', function (done) {
-                memoizedFs.readFile(pathToFooTxt, 'utf-8', passError(done, function (contents) {
+                cachedFs.readFile(pathToFooTxt, 'utf-8', passError(done, function (contents) {
                     expect(contents, 'to equal', 'bla☺bla\n');
                     done();
                 }));
             });
 
             it('should be able to readFile foo.txt as utf-8 then as a Buffer', function (done) {
-                memoizedFs.readFile(pathToFooTxt, 'utf-8', passError(done, function (contents) {
+                cachedFs.readFile(pathToFooTxt, 'utf-8', passError(done, function (contents) {
                     expect(contents, 'to equal', 'bla☺bla\n');
-                    memoizedFs.readFile(pathToFooTxt, passError(done, function (contentsAsBuffer) {
+                    cachedFs.readFile(pathToFooTxt, passError(done, function (contentsAsBuffer) {
                         expect(contentsAsBuffer, 'to equal', new Buffer('bla☺bla\n', 'utf-8'));
                         done();
                     }));
@@ -112,9 +112,9 @@ describe('CachedFs', function () {
 
             // This is debatable, maybe they should get different Buffer instances?
             it('should return the same Buffer instance when the readFile function is called repeatedly', function (done) {
-                memoizedFs.readFile(pathToFooTxt, passError(done, function (firstContents) {
+                cachedFs.readFile(pathToFooTxt, passError(done, function (firstContents) {
                     expect(firstContents, 'to be', firstContents);
-                    memoizedFs.readFile(pathToFooTxt, passError(done, function (secondContents) {
+                    cachedFs.readFile(pathToFooTxt, passError(done, function (secondContents) {
                         expect(secondContents, 'to be', firstContents);
                         done();
                     }));
@@ -122,8 +122,8 @@ describe('CachedFs', function () {
             });
 
             it('should return the same buffer instance when the readFile function is called more than once with different representations of the path to foo.txt', function (done) {
-                memoizedFs.readFile(pathToFooTxt, passError(done, function (firstContents) {
-                    memoizedFs.readFile(alternativePathToFooTxt, passError(done, function (secondContents) {
+                cachedFs.readFile(pathToFooTxt, passError(done, function (firstContents) {
+                    cachedFs.readFile(alternativePathToFooTxt, passError(done, function (secondContents) {
                         expect(secondContents, 'to be', firstContents);
                         done();
                     }));
@@ -132,8 +132,8 @@ describe('CachedFs', function () {
 
             // This is debatable, maybe they should get different array instances?
             it('should return the same array when readdir is called with and without a trailing slash', function (done) {
-                memoizedFs.readdir(pathToTestFiles, passError(done, function (firstEntries) {
-                    memoizedFs.readdir(pathToTestFiles + Path.sep, passError(done, function (secondEntries) {
+                cachedFs.readdir(pathToTestFiles, passError(done, function (firstEntries) {
+                    cachedFs.readdir(pathToTestFiles + Path.sep, passError(done, function (secondEntries) {
                         expect(secondEntries, 'to be', firstEntries);
                         done();
                     }));
@@ -142,8 +142,8 @@ describe('CachedFs', function () {
 
             it('should return the same chunks when createReadStream is called twice with the same arguments', function (done) {
                 var readStreams = [
-                    memoizedFs.createReadStream(pathToFooTxt),
-                    memoizedFs.createReadStream(pathToFooTxt)
+                    cachedFs.createReadStream(pathToFooTxt),
+                    cachedFs.createReadStream(pathToFooTxt)
                 ];
                 readStreams.forEach(function (readStream) {
                     readStream.on('data', function (chunk) {
@@ -161,7 +161,7 @@ describe('CachedFs', function () {
             });
         });
         describe('with a custom cache and cacheKeyPrefix', function () {
-            var memoizedFs,
+            var cachedFs,
                 cacheKeyPrefix,
                 cache;
 
@@ -170,37 +170,37 @@ describe('CachedFs', function () {
                 cache = new LRUCache({
                     max: 2
                 });
-                memoizedFs = new CachedFs(require('fs'), {cache: cache, cacheKeyPrefix: cacheKeyPrefix});
+                cachedFs = new CachedFs(require('fs'), {cache: cache, cacheKeyPrefix: cacheKeyPrefix});
             });
 
             it('should stringify cacheKeyPrefix', function () {
-                expect(memoizedFs.cacheKeyPrefix, 'to equal', '999');
+                expect(cachedFs.cacheKeyPrefix, 'to equal', '999');
             });
 
             it('should populate the passed cache after reading a file', function (done) {
-                memoizedFs.readFile(pathToFooTxt, passError(done, function (contents) {
+                cachedFs.readFile(pathToFooTxt, passError(done, function (contents) {
                     expect(contents, 'to equal', new Buffer('bla☺bla\n', 'utf-8'));
                     expect(cache.keys(), 'to have length', 1);
-                    expect(cache.get(memoizedFs.getCacheKey('readFile', pathToFooTxt)), 'to equal', [null, new Buffer('bla☺bla\n', 'utf-8')]);
+                    expect(cache.get(cachedFs.getCacheKey('readFile', pathToFooTxt)), 'to equal', [null, new Buffer('bla☺bla\n', 'utf-8')]);
                     done();
                 }));
             });
 
             it('should evict items after exceeding the max of 2 items', function () {
-                memoizedFs.readFileSync(pathToFooTxt);
+                cachedFs.readFileSync(pathToFooTxt);
                 expect(cache.keys(), 'to have length', 1);
-                expect(cache.get(memoizedFs.getCacheKey('readFile', pathToFooTxt)), 'to equal', [null, new Buffer('bla☺bla\n', 'utf-8')]);
+                expect(cache.get(cachedFs.getCacheKey('readFile', pathToFooTxt)), 'to equal', [null, new Buffer('bla☺bla\n', 'utf-8')]);
 
-                memoizedFs.readFileSync(pathToBarTxt);
+                cachedFs.readFileSync(pathToBarTxt);
                 expect(cache.keys(), 'to have length', 2);
-                expect(cache.get(memoizedFs.getCacheKey('readFile', pathToFooTxt)), 'to equal', [null, new Buffer('bla☺bla\n', 'utf-8')]);
-                expect(cache.get(memoizedFs.getCacheKey('readFile', pathToBarTxt)), 'to equal', [null, new Buffer('bar\n', 'utf-8')]);
+                expect(cache.get(cachedFs.getCacheKey('readFile', pathToFooTxt)), 'to equal', [null, new Buffer('bla☺bla\n', 'utf-8')]);
+                expect(cache.get(cachedFs.getCacheKey('readFile', pathToBarTxt)), 'to equal', [null, new Buffer('bar\n', 'utf-8')]);
 
-                memoizedFs.readFileSync(pathToQuuxTxt);
+                cachedFs.readFileSync(pathToQuuxTxt);
                 expect(cache.keys(), 'to have length', 2);
-                expect(cache.get(memoizedFs.getCacheKey('readFile', pathToFooTxt)), 'to equal', undefined);
-                expect(cache.get(memoizedFs.getCacheKey('readFile', pathToBarTxt)), 'to equal', [null, new Buffer('bar\n', 'utf-8')]);
-                expect(cache.get(memoizedFs.getCacheKey('readFile', pathToQuuxTxt)), 'to equal', [null, new Buffer('quux\n', 'utf-8')]);
+                expect(cache.get(cachedFs.getCacheKey('readFile', pathToFooTxt)), 'to equal', undefined);
+                expect(cache.get(cachedFs.getCacheKey('readFile', pathToBarTxt)), 'to equal', [null, new Buffer('bar\n', 'utf-8')]);
+                expect(cache.get(cachedFs.getCacheKey('readFile', pathToQuuxTxt)), 'to equal', [null, new Buffer('quux\n', 'utf-8')]);
             });
         });
     });

@@ -44,7 +44,13 @@ describe('CachedFs', function () {
             }));
         });
 
-        it('should make readFileSync work if readFile has previously been called with the same arguments', function (done) {
+        it('should have a readFileSync that throws if readFile has not previously been called with the same arguments', function () {
+            expect(function () {
+                cachedFs.readFileSync(pathToFooTxt);
+            }, 'to throw exception', 'CachedFs.readFileSync: No memoized readFile result found');
+        });
+
+        it('should have a readFileSync that works if readFile has previously been called with the same arguments', function (done) {
             cachedFs.readFile(pathToFooTxt, passError(done, function (contents) {
                 var syncReadContents = cachedFs.readFileSync(pathToFooTxt);
                 expect(syncReadContents, 'to be', contents);

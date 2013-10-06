@@ -210,4 +210,44 @@ describe('CachedFs', function () {
             });
         });
     });
+
+    describe('patching the built-in fs module "in-place"', function () {
+        var originalReadFile = require('fs').readFile;
+        require('fs').unpatch = 123;
+
+        function getKeysForMethod(methodName) {
+            return require('fs').cache.keys().filter(function (key) {
+                return key.indexOf(require('fs').getCacheKey(methodName)) === 0;
+            });
+        }
+
+        before(function () {
+            CachedFs.patchInPlace();
+            expect(require('fs').unpatch, 'to be a', Function);
+        });
+
+        it('should replace the original readFile', function () {
+            var readFile = require('fs').readFile;
+            expect(readFile, 'to be a', Function);
+            expect(readFile, 'not to be', originalReadFile);
+        });
+
+        it('should cache consecutive readFileSync calls', function () {
+            expect(getKeysForMethod('readFile'), 'to have length', 0);
+            expect(getKeysForMethod('stat'), 'to have length', 0);
+
+            var fooTxt1Buffer = require('fs').readFileSync(pathToFooTxt);
+            expect(getKeysForMethod('readFile'), 'to have length', 1);
+
+            var fooTxt2Buffer = require('fs').readFileSync(pathToFooTxt);
+            expect(getKeysForMethod('readFile'), 'to have length', 1);
+            expect(fooTxt1Buffer, 'to be', fooTxt2Buffer);
+        });
+
+        after(function () {
+            require('fs').unpatch();
+            expect(require('fs').readFile, 'to be', originalReadFile);
+            expect(require('fs').unpatch, 'to equal', 123);
+        });
+    });
 });

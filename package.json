@@ -9,8 +9,8 @@
   "dependencies": {
     "bufferedstream": "~1.6.0",
     "lru-cache": "=2.3.1",
-    "memoizeasync": "=0.4.1",
-    "memoizesync": "=0.4.1",
+    "memoizeasync": "=0.4.2",
+    "memoizesync": "=0.4.2",
     "passerror": "=0.0.2"
   },
   "devDependencies": {

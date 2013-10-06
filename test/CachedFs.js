@@ -28,7 +28,7 @@ describe('CachedFs', function () {
         sinon.spy(stubbedFs, 'readFile');
 
         beforeEach(function () {
-            cachedFs = new CachedFs(stubbedFs);
+            cachedFs = new CachedFs({fs: stubbedFs});
         });
 
         it('should produce an object with a readFile and readFileSync property', function () {
@@ -76,7 +76,7 @@ describe('CachedFs', function () {
         describe('with the default options', function () {
             var cachedFs;
             beforeEach(function () {
-                cachedFs = new CachedFs(require('fs'));
+                cachedFs = new CachedFs({fs: require('fs')});
             });
 
             it('should be able to readFile foo.txt', function (done) {
@@ -176,7 +176,7 @@ describe('CachedFs', function () {
                 cache = new LRUCache({
                     max: 2
                 });
-                cachedFs = new CachedFs(require('fs'), {cache: cache, cacheKeyPrefix: cacheKeyPrefix});
+                cachedFs = new CachedFs({fs: require('fs'), cache: cache, cacheKeyPrefix: cacheKeyPrefix});
             });
 
             it('should stringify cacheKeyPrefix', function () {

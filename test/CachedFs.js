@@ -28,7 +28,7 @@ describe('CachedFs', function () {
         sinon.spy(stubbedFs, 'readFile');
 
         beforeEach(function () {
-            cachedFs = new CachedFs({fs: stubbedFs});
+            cachedFs = new CachedFs(stubbedFs);
         });
 
         it('should produce an object with a readFile and readFileSync property', function () {
@@ -76,7 +76,7 @@ describe('CachedFs', function () {
         describe('with the default options', function () {
             var cachedFs;
             beforeEach(function () {
-                cachedFs = new CachedFs({fs: require('fs')});
+                cachedFs = new CachedFs(require('fs'));
             });
 
             it('should be able to readFile foo.txt', function (done) {

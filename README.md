@@ -48,9 +48,9 @@ options object with the following options:
 * `debug`: Log when methods are called. Defaults to `false`.
 
 * `context`: The context to call the wrapped `fs` functions
-  in. (Probably not useful). Defaults to false
+  in. (Probably not useful except internally). Defaults to `false`.
 
-* `max`, `maxAge`, `length`, `dispose`, `stale`, : Passed to the
+* `max`, `maxAge`, `length`, `dispose`, `stale` : Passed to the
   `lru-cache` constructor unless the `cache` option is specified. See
   [the lru-cache README for
   details](https://github.com/isaacs/node-lru-cache).
@@ -58,7 +58,20 @@ options object with the following options:
 If you don't specify a `length` option, it will default to a function
 that approximates the number of bytes occupied by the cached
 values. That means you can use the `max` option to set an upper limit
-on the memory usage in bytes.
+on the memory usage in bytes:
+
+```javascript
+var CachedFs = require('cachedfs'),
+    cachedFs = new CachedFs({max: 104857600});
+```
+
+or when patch the built-in `fs` module in-place:
+
+```javascript
+var CachedFs = require('cachedfs');
+
+CachedFs.patchInPlace({max: 104857600});
+```
 
 An instantiated `CachedFs` has the following properties:
 

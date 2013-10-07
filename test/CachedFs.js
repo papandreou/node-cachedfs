@@ -8,6 +8,7 @@ var expect = require('unexpected-sinon'),
     pathToFooTxt = Path.resolve(pathToTestFiles, 'foo.txt'),
     pathToBarTxt = Path.resolve(pathToTestFiles, 'bar.txt'),
     pathToQuuxTxt = Path.resolve(pathToTestFiles, 'quux.txt'),
+    pathToNonExistentFile = Path.resolve(pathToTestFiles, 'i', 'do', 'not', 'exist.txt'),
     alternativePathToFooTxt = pathToTestFiles + Path.sep + '.' + Path.sep + 'foo.txt';
 
 describe('CachedFs', function () {
@@ -84,6 +85,32 @@ describe('CachedFs', function () {
                     expect(contents, 'to equal', new Buffer('bla☺bla\n', 'utf-8'));
                     done();
                 }));
+            });
+
+            it('should compute the size of the cache correctly after a file has been read', function () {
+                expect(cachedFs.cache.length, 'to equal', 0);
+                cachedFs.readFileSync(pathToFooTxt);
+                expect(cachedFs.cache.length, 'to equal', new Buffer('bla☺bla\n', 'utf-8').length);
+            });
+
+            it('should compute the size of the cache correctly after a file has been statted', function () {
+                expect(cachedFs.cache.length, 'to equal', 0);
+                cachedFs.statSync(pathToFooTxt);
+                expect(cachedFs.cache.length, 'to equal', 1024);
+            });
+
+            it('should compute the size of the cache correctly after a directory has been readdired', function () {
+                expect(cachedFs.cache.length, 'to equal', 0);
+                var entries = cachedFs.readdirSync(pathToTestFiles);
+                expect(cachedFs.cache.length, 'to equal', 512 + entries.length * 10);
+            });
+
+            it('should compute the size of the cache correctly after an error has been cached', function () {
+                expect(cachedFs.cache.length, 'to equal', 0);
+                expect(function () {
+                    cachedFs.readFileSync(pathToNonExistentFile);
+                }, 'to throw exception', "ENOENT, no such file or directory '" + pathToNonExistentFile + "'");
+                expect(cachedFs.cache.length, 'to equal', 1024);
             });
 
             it('should be able to readFileSync foo.txt', function () {

@@ -22,7 +22,6 @@ fs.readFile('foo.txt', function (err, contents) {
 Supported functions (plus their -`Sync` counterparts):
  * `stat`
  * `lstat`
- * `fstat`
  * `readlink`
  * `realpath`
  * `readdir`

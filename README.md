@@ -33,6 +33,10 @@ require('fs').readFile('foo.txt', function (err, contents) {
 The `CachedFs` constructor and `CachedFs.patchInPlace` support an
 options object with the following options:
 
+* `fs`: The `fs` module to wrap. Defaults to `require('fs')`, but
+  could also be used with something like
+  [gitfakefs](https://github.com/papandreou/node-gitfakefs).
+
 * `cache`: An existing `node-lru` instance to use for the cached
   data. The default is to create a new one (exposed via `cachedFs.cache`).
 
@@ -48,7 +52,8 @@ options object with the following options:
 * `debug`: Log when methods are called. Defaults to `false`.
 
 * `context`: The context to call the wrapped `fs` functions
-  in. (Probably not useful except internally). Defaults to `false`.
+  in. (Probably not useful except internally). Defaults to the wrapped
+  `fs` module.
 
 * `max`, `maxAge`, `length`, `dispose`, `stale` : Passed to the
   `lru-cache` constructor unless the `cache` option is specified. See
@@ -81,6 +86,10 @@ An instantiated `CachedFs` has the following properties:
   `cache.length`, `cache.itemCount`, or purging all cached items via
   `cache.reset()`, etc. See [the lru-cache
   README](https://github.com/isaacs/node-lru-cache).
+
+* `argumentsStringifier`: Function that turns an array of arguments
+  for a `fs` method into a cache key. Mostly exposed so it doesn't
+  have to be duplicated in the test suite.
 
 Supported methods:
  * `stat`, `statSync`

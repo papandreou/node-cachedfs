@@ -41,6 +41,15 @@ options object with the following options:
   instance. You can override this to explicitly force two `CachedFs`
   instances to share the same cached data for some reason.
 
+* `skipUnimplemented`: Don't add "not implemented" stubs that throw
+  exceptions. Mostly useful when patching an existing `fs`
+  implementation in-place. Defaults to `false`.
+
+* `debug`: Log when methods are called. Defaults to `false`.
+
+* `context`: The context to call the wrapped `fs` functions
+  in. (Probably not useful). Defaults to false
+
 * `max`, `maxAge`, `length`, `dispose`, `stale`, : Passed to the
   `lru-cache` constructor unless the `cache` option is specified. See
   [the lru-cache README for
@@ -60,14 +69,15 @@ An instantiated `CachedFs` has the following properties:
   `cache.reset()`, etc. See [the lru-cache
   README](https://github.com/isaacs/node-lru-cache).
 
-Supported methods (plus their -`Sync` counterparts):
- * `stat`
- * `lstat`
- * `readlink`
- * `realpath`
- * `readdir`
- * `readFile`
- * `exists`
+Supported methods:
+ * `stat`, `statSync`
+ * `lstat`, `lstatSync`
+ * `readlink`, `readlinkSync`
+ * `realpath`, `realpathSync`
+ * `readdir`, `readdirSync`
+ * `readFile`, `readFileSync`
+ * `exists`, `existsSync`
+ * `createReadStream`
 
 Bonus features:
 

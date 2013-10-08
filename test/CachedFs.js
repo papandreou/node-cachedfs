@@ -13,22 +13,26 @@ var expect = require('unexpected-sinon'),
 
 describe('CachedFs', function () {
     describe('applied to a stubbed out fs module with only a readFile function', function () {
-        var stubbedFs = {
+        var stubbedFs,
+            cachedFs;
+
+        beforeEach(function () {
+            stubbedFs = {
                 readFile: function (fileName, encoding, cb) {
                     if (typeof encoding === 'function') {
                         cb = encoding;
                         encoding = null;
                     }
                     process.nextTick(function () {
-                        cb(null, 'the contents of ' + fileName + ' in encoding ' + encoding);
+                        var contents = new Buffer('the contents of ' + fileName, 'utf-8');
+                        if (encoding) {
+                            contents = contents.toString('utf-8');
+                        }
+                        cb(null, contents);
                     });
                 }
-            },
-            cachedFs;
-
-        sinon.spy(stubbedFs, 'readFile');
-
-        beforeEach(function () {
+            };
+            sinon.spy(stubbedFs, 'readFile');
             cachedFs = new CachedFs(stubbedFs);
         });
 
@@ -67,7 +71,7 @@ describe('CachedFs', function () {
                })
                .on('end', function () {
                    expect(chunks, 'to have length', 1);
-                   expect(chunks[0].toString('utf-8'), 'to equal', 'the contents of ' + pathToFooTxt + ' in encoding null');
+                   expect(chunks[0].toString('utf-8'), 'to equal', 'the contents of ' + pathToFooTxt);
                    done();
                });
         });

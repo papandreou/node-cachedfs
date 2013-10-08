@@ -31,7 +31,7 @@ require('fs').readFile('foo.txt', function (err, contents) {
 ```
 
 The `CachedFs` constructor and `CachedFs.patchInPlace` support an
-options object with the following options:
+options object with the following properties:
 
 * `fs`: The `fs` module to wrap. Defaults to `require('fs')`, but
   could also be used with something like
@@ -70,7 +70,7 @@ var CachedFs = require('cachedfs'),
     cachedFs = new CachedFs({max: 104857600});
 ```
 
-or when patch the built-in `fs` module in-place:
+or when patching the built-in `fs` module in-place:
 
 ```javascript
 var CachedFs = require('cachedfs');

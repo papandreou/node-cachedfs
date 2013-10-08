@@ -40,6 +40,17 @@ describe('CachedFs', function () {
             expect(cachedFs, 'to have keys', ['readFile', 'readFileSync']);
         });
 
+        it('should only call the stubbed-out readFile once if the same file is first read a Buffer, then again synchronously with an encoding parameter', function (done) {
+            cachedFs.readFile(pathToFooTxt, passError(done, function (firstContents) {
+                expect(firstContents, 'to be a', Buffer);
+                var syncReadContents = cachedFs.readFileSync(pathToFooTxt, 'utf-8');
+                expect(syncReadContents, 'to be a string');
+                expect(firstContents.toString('utf-8'), 'to equal', syncReadContents);
+                expect(stubbedFs.readFile, 'was called once');
+                done();
+            }));
+        });
+
         it('should only call the stubbed-out readFile once', function (done) {
             cachedFs.readFile(pathToFooTxt, passError(done, function (firstContents) {
                 cachedFs.readFile(pathToFooTxt, passError(done, function (secondContents) {
